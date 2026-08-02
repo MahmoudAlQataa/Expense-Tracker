@@ -14,7 +14,7 @@ A system for recording and tracking personal expenses, built with Flask and SQLA
 
 ## 🚧 Project Status
 
-This project is still in progress. It's being built following [this tutorial series](https://www.youtube.com/playlist?list=PLMLdiraLeES2JUghbXxsgVi_7ifYiWoC6).
+This project is still in progress.
 
 ### ✅ Done so far
 - Basic project structure set up
@@ -54,7 +54,7 @@ Expense-Tracker/
 │ ├── base.html
 │ └── index.html
 ├── instance/
-│ └── expenses.db # auto-created when the app runs (not tracked in Git)
+│ └── expenses.db       # auto-created when the app runs (not tracked in Git)
 ├── app.py
 ├── requirements.txt
 └── .gitignore
