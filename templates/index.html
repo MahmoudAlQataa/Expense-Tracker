@@ -91,7 +91,7 @@
             </label>
             <label class="block text-sm">
               <span class="mb-1 block text-slate-300">Date</span>
-              <input name="date" type="date"
+              <input name="date" type="date" value="{{ current_date }}"
                 class="w-full rounded-xl bg-slate-800 border border-slate-700 px-3 py-2 text-slate-100" />
             </label>
           </div>
@@ -154,10 +154,16 @@
               <td class="px-4 py-2">{{ e.category }}</td>
               <td class="px-4 py-2 text-right">${{ '%.2f'|format(e.amount) }}</td> <!-- formating for 2 digets , -->
               <td class="px-4 py-2 text-right">
-                <button
-                  class="text-rose-300 hover:text-rose-200 text-xs border border-rose-400/30 px-3 py-1 rounded-lg">
-                  Delete
-                </button>
+
+
+                <form action="{{ url_for('delete', expense_id=e.id) }}" method="POST"
+                  onsubmit="return confirm('Are you sure you want to delete?')">
+                  <button
+                    class="text-rose-300 hover:text-rose-200 text-xs border border-rose-400/30 px-3 py-1 rounded-lg">
+                    Delete
+                  </button>
+                </form>
+
               </td>
             </tr>
 

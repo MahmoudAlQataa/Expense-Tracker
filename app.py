@@ -5,10 +5,11 @@ import socket
 
 # intialaising the flask app
 app = Flask(__name__)
+
 app.config['SECRET_KEY'] = 'mahmoud-test-key' # a decode key for the cash data that stored in the setion
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///expenses.db' # tell SQLAlchemy where the db is located 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # stop the tracking we don't need it 
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # stop the tracking we don't need it yet
 db = SQLAlchemy(app) # (Initialize SQLAlchemy) creat the db and connect it to the app
 
 # Define the Expense table (model).
@@ -38,6 +39,7 @@ def index():
         expenses=expenses,
         categories=CATEGORIES,
         total=total,
+        current_date=date.today().strftime("%Y-%m-%d")
         ) # sending the data to the front-end
 
 
@@ -78,6 +80,15 @@ def add(): # the data send by method='POST', action={{url_for('add')}}
     flash("Expense added", "success")
     print(f" * Form Received : {dict(request.form)}")
     return redirect(url_for("index"))
+
+# Delete route
+@app.route("/delete/<int:expense_id>", methods=["POST"])
+def delete(expense_id):
+    e = Expense.query.get_or_404(expense_id) # Get the expense by ID or return 404 if not found
+    db.session.delete(e) # Delete the expense from the database
+    db.session.commit() # Commit the changes to the database
+    flash("Expense deleted", "success") # Flash a success massage
+    return redirect(url_for("index")) # Redirect back to the index page
 
 
 
