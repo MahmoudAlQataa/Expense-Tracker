@@ -25,21 +25,53 @@ class Expense(db.Model):
 with app.app_context(): # Enter the Flask application context. (# go in the env)
     db.create_all() # Create all tables defined by the models (if they don't already exist).
 
+# we need to make it entered by the user
 CATEGORIES =['Food', 'Transport', 'Rent', 'Utilities', 'Health'] #
+
+def parse_date_or_none(s: str):
+    if not s:
+        return None
+    try:
+        return datetime.strptime(s, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
 
 # the main route 
 @app.route("/")
 def index():
+    # ======================== THE FILTERs ======================== 
+    # read the start and end date from the front-end query parameters
+    start_str = (request.args.get("start") or "").strip()
+    end_str = (request.args.get("end") or "").strip()
+    # parse the start and end dates
+    start_date = parse_date_or_none(start_str)
+    end_date = parse_date_or_none(end_str)
+    # 
+    if start_date and end_date and end_date < start_date:
+        flash("End date can't be earlier than start date", "error")
+        start_date = end_date = None
+        start_str = end_str = ""
+    # 
+    q = Expense.query
+
+    if start_date:
+        q = q.filter(Expense.date >= start_date)
+    if end_date:
+        q = q.filter(Expense.date <= end_date)
+            
     # pulling the data from the db
-    expenses = Expense.query.order_by(Expense.date.desc(), Expense.id.desc()).all() 
+    expenses = q.order_by(Expense.date.desc(), Expense.id.desc()).all() 
     total = round(sum(e.amount for e in expenses), 2) # sum of amount
     
     return render_template(
-        "index.html", 
-        expenses=expenses,
+        "index.html",
         categories=CATEGORIES,
+        current_date=date.today().strftime("%Y-%m-%d"),
+        expenses=expenses,
         total=total,
-        current_date=date.today().strftime("%Y-%m-%d")
+        start_str=start_str,
+        end_str=end_str,
         ) # sending the data to the front-end
 
 
