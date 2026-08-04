@@ -26,7 +26,7 @@ with app.app_context(): # Enter the Flask application context. (# go in the env)
     db.create_all() # Create all tables defined by the models (if they don't already exist).
 
 # we need to make it entered by the user
-CATEGORIES =['Food', 'Transport', 'Rent', 'Utilities', 'Health'] #
+CATEGORIES =['Food', 'Transport', 'Rent', 'Utilities', 'Health'] 
 
 def parse_date_or_none(s: str):
     if not s:
@@ -44,6 +44,7 @@ def index():
     # read the start and end date from the front-end query parameters
     start_str = (request.args.get("start") or "").strip()
     end_str = (request.args.get("end") or "").strip()
+    selected_category = (request.args.get("category") or "" ).strip()
     # parse the start and end dates
     start_date = parse_date_or_none(start_str)
     end_date = parse_date_or_none(end_str)
@@ -59,7 +60,10 @@ def index():
         q = q.filter(Expense.date >= start_date)
     if end_date:
         q = q.filter(Expense.date <= end_date)
-            
+    
+    if selected_category:
+        q = q.filter(Expense.category == selected_category)
+        
     # pulling the data from the db
     expenses = q.order_by(Expense.date.desc(), Expense.id.desc()).all() 
     total = round(sum(e.amount for e in expenses), 2) # sum of amount
@@ -67,11 +71,12 @@ def index():
     return render_template(
         "index.html",
         categories=CATEGORIES,
-        current_date=date.today().strftime("%Y-%m-%d"),
+        today=date.today().isoformat(),
         expenses=expenses,
         total=total,
         start_str=start_str,
         end_str=end_str,
+        selected_category=selected_category,
         ) # sending the data to the front-end
 
 

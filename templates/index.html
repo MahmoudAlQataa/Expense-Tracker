@@ -32,7 +32,7 @@
         <form method="get" action="{{ url_for('index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end pr-5">
           <label class="text-sm">
             <span class="block mb-1 text-slate-300">Start</span>
-            <input name="start" value="{{ end_str or '' }}" type="date"
+            <input name="start" value="{{ start_str or '' }}" type="date"
               class="w-full rounded-xl bg-slate-800 border border-slate-700 px-3 py-2 text-slate-100" />
           </label>
           <label class="text-sm">
@@ -42,11 +42,14 @@
           </label>
           <label class="text-sm md:col-span-2">
             <span class="block mb-1 text-slate-300">Category</span>
-            <select class="w-full rounded-xl bg-slate-800 border border-slate-700 px-3 py-2 text-slate-100">
+            <select name="category"
+              class="w-full rounded-xl bg-slate-800 border border-slate-700 px-3 py-2 text-slate-100">
               <option value="">All</option>
-              <option>Food</option>
-              <option>Transport</option>
-              <option>Utilities</option>
+
+              {% for c in categories %} <!-- pulling the category -->
+              <option value="{{ c }}" {% if selected_category==c %} selected {% endif %}>{{ c }}</option>
+              {% endfor %}
+
             </select>
           </label>
           <div class="flex gap-2">
@@ -54,7 +57,10 @@
               type="submit">
               Apply
             </button>
-            <a class="rounded-xl bg-slate-800 hover:bg-slate-700 px-4 py-2 border border-slate-700" href="#">Reset</a>
+            <a class="rounded-xl bg-slate-800 hover:bg-slate-700 px-4 py-2 border border-slate-700"
+              href="{{ url_for('index') }}">
+              Reset
+            </a>
           </div>
         </form>
 
@@ -62,7 +68,7 @@
         <div class="mt-4 text-sm text-slate-300">
           <span class="mr-2">Total:</span>
           <span class="inline-block rounded-xl border border-slate-700 bg-slate-800 px-3 py-1 font-semibold">
-            $0.00
+            ${{ '%2.f'|format(total or 0) }}
           </span>
         </div>
 
@@ -91,7 +97,7 @@
             </label>
             <label class="block text-sm">
               <span class="mb-1 block text-slate-300">Date</span>
-              <input name="date" type="date" value="{{ current_date }}"
+              <input name="date" type="date" value="{{ today }}"
                 class="w-full rounded-xl bg-slate-800 border border-slate-700 px-3 py-2 text-slate-100" />
             </label>
           </div>
