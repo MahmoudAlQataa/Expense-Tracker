@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, make_response, flash, redirect
+from flask import Flask, render_template, request, url_for, make_response, flash, redirect, Response
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date, datetime
 import socket
@@ -127,6 +127,46 @@ def delete(expense_id):
     flash("Expense deleted", "success") # Flash a success massage
     return redirect(url_for("index")) # Redirect back to the index page
 
+
+# export route
+@app.route("/export.csv")
+def export_csv():
+    # read the start and end date from the front-end query parameters
+    start_str = (request.args.get("start") or "").strip()
+    end_str = (request.args.get("end") or "").strip()
+    selected_category = (request.args.get("category") or "" ).strip()
+    # parse the start and end dates
+    start_date = parse_date_or_none(start_str)
+    end_date = parse_date_or_none(end_str)
+
+    q = Expense.query
+    
+    if start_date:
+        q = q.filter(Expense.date >= start_date)
+    if end_date:
+        q = q.filter(Expense.date <= end_date)
+    
+    if selected_category:
+        q = q.filter(Expense.category == selected_category)
+        
+    expenses = q.order_by(Expense.date.desc(), Expense.id.desc()).all() # pulling the data from the db
+    lines = ["date, description, amount, category"]
+
+    for e in expenses:
+        lines.append(f"{e.date.isoformat()}, {e.description}, {e.category}, {e.amount:.2f}")
+    csv_data = "\n".join(lines)
+
+    fname_start = start_str or "all"
+    fname_end = end_str or "all"
+    filename = f"expenses_{fname_start}_to_{fname_end}.csv"
+    
+    return Response(
+        csv_data,
+        headers={
+            "Content-Type" : "text/csv",
+            "Content-Disposition" : f"attachment; filename={filename}",
+        }
+    )
 
 
 
