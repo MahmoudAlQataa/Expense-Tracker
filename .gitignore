@@ -47,3 +47,6 @@ htmlcov/
 
 # PyInstaller 
 *.spec
+
+# notes
+notes.txt
