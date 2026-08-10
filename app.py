@@ -26,7 +26,7 @@ with app.app_context(): # Enter the Flask application context. (# go in the env)
     db.create_all() # Create all tables defined by the models (if they don't already exist).
 
 # we need to make it entered by the user
-CATEGORIES =['Food', 'Transport', 'Rent', 'Utilities', 'Health'] 
+CATEGORIES =['Food', 'Transport', 'Rent', 'Utilities', 'Health', "furniture"] 
 
 def parse_date_or_none(s: str):
     if not s:
